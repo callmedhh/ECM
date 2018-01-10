@@ -41,10 +41,10 @@ public class ChainCreator {
 			JsonWriter jsonWriter = new JsonWriter();
 			//构建证据事实关系
 			calcLink(fList, eList);
-			jsonWriter.writeListToJson(fList,folderName+"/result/"+fileName+"fact.json");
-			jsonWriter.writeListToJson(eList,folderName+"/result/"+fileName+"evidence.json");
+			jsonWriter.writeListToJson(fList,folderName+"/result/fact/"+fileName+"fact.json");
+			jsonWriter.writeListToJson(eList,folderName+"/result/evidence/"+fileName+"evidence.json");
 			//计算证据链头
-			//calcHead(fList);
+			calcHead(fList);
 			
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block

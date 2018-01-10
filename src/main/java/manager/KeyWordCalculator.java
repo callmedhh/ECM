@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.NlpAnalysis;
@@ -207,10 +208,12 @@ public class KeyWordCalculator {
 
         }
         list = hanlpParse(content, list);
-        //去除停用词
-        List<String> resultList = wordFilter.filterStopWords(list);
-
-        return resultList;
+        if (list != null) {
+            List<String> resultList = wordFilter.filterStopWords(list);
+            return resultList;
+        }else {
+            return new ArrayList<>();
+        }
     }
     public static String findDescriptions(Map<String,String> link, String name){
         String result = name;
@@ -227,37 +230,42 @@ public class KeyWordCalculator {
         return result;
     }
     private List<String> hanlpParse(String ss, List<String> list){
-        CoNLLSentence sentence = HanLP.parseDependency(ss);
-        // 遍历语义依存关系,如果发现带宾语的关系则提取宾语并完善该宾语（利用定中关系来完善）
-        Map<String,String> describeLink = new HashMap<String, String>();
-        for (CoNLLWord word : sentence)
-        {
-            if(word.DEPREL.equals("定中关系")){
-                describeLink.put(word.HEAD.LEMMA,word.LEMMA);
-            }
-            if(word.DEPREL.equals("动宾关系")||word.DEPREL.equals("介宾关系")){
-                String tmp = findDescriptions(describeLink,word.LEMMA);
-                //测试备选短语的词性
-                if (tmp.equals("放在")){
-                    continue;
+        try{
+            CoNLLSentence sentence = HanLP.parseDependency(ss);
+            // 遍历语义依存关系,如果发现带宾语的关系则提取宾语并完善该宾语（利用定中关系来完善）
+            Map<String,String> describeLink = new HashMap<String, String>();
+            for (CoNLLWord word : sentence)
+            {
+                if(word.DEPREL.equals("定中关系")){
+                    describeLink.put(word.HEAD.LEMMA,word.LEMMA);
                 }
-                Result result = NlpAnalysis.parse(tmp);
-                //如果备选短语为一个单词，则不可以为名称词、地点词或动词
-                if(result.size()==1){
-                    String nature = result.get(0).getNatureStr();
-                    if(!nature.startsWith("nr") && !nature.startsWith("nt") && !nature.startsWith("ns")
-                            && !("s").equals(nature) && !nature.startsWith("v")){
+                if(word.DEPREL.equals("动宾关系")||word.DEPREL.equals("介宾关系")){
+                    String tmp = findDescriptions(describeLink,word.LEMMA);
+                    //测试备选短语的词性
+                    if (tmp.equals("放在")){
+                        continue;
+                    }
+                    Result result = NlpAnalysis.parse(tmp);
+                    //如果备选短语为一个单词，则不可以为名称词、地点词或动词
+                    if(result.size()==1){
+                        String nature = result.get(0).getNatureStr();
+                        if(!nature.startsWith("nr") && !nature.startsWith("nt") && !nature.startsWith("ns")
+                                && !("s").equals(nature) && !nature.startsWith("v")){
+                            if(!list.contains(tmp))
+                                list.add(tmp);
+                        }
+                    }else{
                         if(!list.contains(tmp))
                             list.add(tmp);
                     }
-                }else{
-                    if(!list.contains(tmp))
-                        list.add(tmp);
                 }
             }
-        }
 
-        return list;
+            return list;
+        } catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static void main(String[] args) {

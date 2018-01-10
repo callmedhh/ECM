@@ -3,6 +3,7 @@ package reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -74,7 +75,7 @@ public class XMLReaderCri extends XMLReader {
 				// 如果证据分组中没有认定事实节点，则说明证据无关联事实
 				if(!hasChildNode(currentNode, "RDSS")){
 					NodeList childNodeList = currentNode.getChildNodes();
-					
+
 					if(childNodeList!=null && childNodeList.getLength()>0){
 						for(int j=0;j<childNodeList.getLength();j++){
 							Node childNode = childNodeList.item(j);
@@ -89,5 +90,4 @@ public class XMLReaderCri extends XMLReader {
 
 		return evidenceList;
 	}
-	
 }
