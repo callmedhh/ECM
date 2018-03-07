@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import jdk.nashorn.internal.runtime.arrays.ArrayIndex;
 import org.ansj.domain.Result;
 import org.ansj.domain.Term;
 import org.ansj.splitWord.analysis.NlpAnalysis;
@@ -18,12 +17,12 @@ import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLSentence;
 import com.hankcs.hanlp.corpus.dependency.CoNll.CoNLLWord;
 
-import model.EvidenceModel;
 import model.FactModel;
+import model.EvidenceModel;
 
 public class KeyWordCalculator {
 
-    WordFilter wordFilter = new WordFilter();
+    static WordFilter wordFilter = new WordFilter();
 
     public void calcKeyWord(ArrayList<FactModel> fList, ArrayList<EvidenceModel> eList){
         calcFactKeyWord(fList);
@@ -84,7 +83,7 @@ public class KeyWordCalculator {
 
     private List<String> calcHowMuch(String content){
         List<String> list = new ArrayList<String>();
-        Pattern pattern = Pattern.compile("\\d+([\\u4e00-\\u9fa5]{0,1}元)"); //|\\d+英镑
+        Pattern pattern = Pattern.compile("[0-9]+(.[0-9]+)?+元");
         Matcher matcher = pattern.matcher(content);
         while(matcher.find()) {
             String hm = matcher.group();
@@ -219,13 +218,22 @@ public class KeyWordCalculator {
         String result = name;
         while(link.containsKey(name)){
             String value = link.get(name);
-            if (link.containsKey(value)) {
-                result = value+result;
-                return result;
-            }else{
-                result = link.get(name)+result;
-                name = link.get(name);
+            if (!wordFilter.isStopWords(value)) {
+                if (link.containsKey(value)) {
+                    result = value+result;
+                    return result;
+                }else{
+                    result = link.get(name)+result;
+                    name = link.get(name);
+                }
+            } else {
+                if (link.containsKey(value)) {
+                    return result;
+                } else {
+                    name = link.get(name);
+                }
             }
+
         }
         return result;
     }
@@ -240,6 +248,10 @@ public class KeyWordCalculator {
                     describeLink.put(word.HEAD.LEMMA,word.LEMMA);
                 }
                 if(word.DEPREL.equals("动宾关系")||word.DEPREL.equals("介宾关系")){
+                    // TODO 过滤掉 word.LEMMA 为停用词的词组
+                    if(wordFilter.isStopWords(word.LEMMA)){
+                        continue;
+                    }
                     String tmp = findDescriptions(describeLink,word.LEMMA);
                     //测试备选短语的词性
                     if (tmp.equals("放在")){
@@ -270,17 +282,12 @@ public class KeyWordCalculator {
 
     public static void main(String[] args) {
         KeyWordCalculator keyWordCalculator = new KeyWordCalculator();
-        String content = "2、证人周金荣的证言及公安机关照片，证明2007年3月24日其在废品站吃午饭，晚上宁某某一个人在废品站吃晚饭，吃的是其午饭剩下的一盘包菜，一盘油焖笋和一盘红烧肉，估计宁某某是吃不完的。平时剩菜都放在屋内冰箱里。饭是放在煤气灶上的高压锅上。其平时用玻璃茶杯，茶杯一直放在屋内方桌上，当天其离开废品站时没有将茶叶倒掉，另看到一些饼干放在电视机桌上，瓜子则放在枕头边。宁某某平时抽烟的，一般用一次性塑料打火机。发现宁某某被害时，看到有把铁锤放在床边地上几件破衣服上，原先铁锤是放在废品站门边。屋内床上有两条被子，其和宁某某各一条。宁某某因为自己的被子短，平时经常盖其被子，被害当天晚上也是盖其的被子。宁某某被害之前，约在今年二月份，其左手无名指被铁板压伤了，流了很多血，干活时一碰就出血，有时睡觉时也会有血流到被子上。";
         List<String> list = new ArrayList<String>();
-            List<String> result = keyWordCalculator.hanlpParse(content,list);
-            for (String value: result) {
-                System.out.print(value+" ");
-            }
-            System.out.println();
-            WordFilter wordFilter1 = new WordFilter();
-            List<String> resultList = wordFilter1.filterStopWords(result);
-            for (String value: resultList) {
-                System.out.print(value+" ");
+        String content = "10、乘车凭证、发票、收据5000元、销货清单，证实123.45元因周红喜遇害，各附带民事诉讼原告人开支各项实际费用共计人民币31640．5元。";
+        List<String> result = keyWordCalculator.calcHowMuch(content);
+        for (String value: result) {
+            System.out.println(value);
         }
+
     }
 }

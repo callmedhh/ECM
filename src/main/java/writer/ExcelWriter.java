@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import model.EvidenceModel;
 import model.FactModel;
+import model.EvidenceModel;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -29,7 +29,7 @@ public class ExcelWriter {
         //输出Excel文件
         FileOutputStream output;
         try {
-            output = new FileOutputStream("/Users/dongyixuan/workspace/证据链/newresult/"+fileName+".xls");
+            output = new FileOutputStream("/Users/dongyixuan/workspace/证据链/newResult5/"+fileName+".xls");
             wb.write(output);
             output.flush();
 

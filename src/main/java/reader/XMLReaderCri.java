@@ -3,7 +3,7 @@ package reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,7 +23,7 @@ import org.xml.sax.SAXException;
 public class XMLReaderCri extends XMLReader {
 
 	/*获得事实集，每个事实包含关联的证据集*/
-	public ArrayList<FactModel> getFactlist(String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	public ArrayList<FactModel> getFactlist(String path,HashSet<String> typeList) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		ArrayList<FactModel> factList = new ArrayList<FactModel>();
 		
 		DocumentBuilderFactory dbf =DocumentBuilderFactory.newInstance();			  
@@ -45,7 +45,7 @@ public class XMLReaderCri extends XMLReader {
 				while(currentNode.getNextSibling()!=null){
 					currentNode = currentNode.getNextSibling(); //获得下一个节点
 					EvidenceModel evidence = new EvidenceModel();
-					evidence.setEvidence(currentNode);
+					evidence.setEvidence(currentNode,typeList);
 					evidenceList.add(evidence);
 				}
 				
@@ -58,7 +58,7 @@ public class XMLReaderCri extends XMLReader {
 	}
 	
 	/*获得没有关联事实的证据集*/
-	public ArrayList<EvidenceModel> getEvidencelist(String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	public ArrayList<EvidenceModel> getEvidencelist(String path,HashSet<String> typeList) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		ArrayList<EvidenceModel> evidenceList = new ArrayList<EvidenceModel>();
 		
 		DocumentBuilderFactory dbf =DocumentBuilderFactory.newInstance();			  
@@ -80,7 +80,7 @@ public class XMLReaderCri extends XMLReader {
 						for(int j=0;j<childNodeList.getLength();j++){
 							Node childNode = childNodeList.item(j);
 							EvidenceModel evidence = new EvidenceModel();
-							evidence.setEvidence(childNode);
+							evidence.setEvidence(childNode,typeList);
 							evidenceList.add(evidence);
 						}
 					}

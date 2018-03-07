@@ -9,27 +9,18 @@ import org.ansj.domain.Term;
 public class WordFilter {
 
     ArrayList<String> stopWords;
+    ArrayList<String> remainWords;
 
     public WordFilter(){
-        stopWords = getStopWords();
-    }
-
-    public void filterStopWords(Result result){
-        List<Term> terms = new ArrayList<Term>();
-
-        for(Term term : result){
-            if(!stopWords.contains(term.getName())){
-                terms.add(term);
-            }
-        }
-        result.setTerms(terms);
+        stopWords = getWords("/Users/dongyixuan/workspace/证据链/stopWords.txt");
+        remainWords = getWords("/Users/dongyixuan/workspace/证据链/remainWords.txt");
     }
 
     public List<String> filterStopWords(List<String> list){
         List<String> resultList = new ArrayList<String>();
 
         for(String str : list){
-            if (str.length() == 1){
+            if (str.length() == 1 && !remainWords.contains(str)){
                 continue;
             }
             if(!stopWords.contains(str)){
@@ -40,32 +31,25 @@ public class WordFilter {
         return resultList;
     }
 
-    public void filterSingleWords(Result result){
-        List<Term> terms = new ArrayList<Term>();
-
-        for(Term term : result){
-            if(term.getName().length()>1){
-                terms.add(term);
-            }
-        }
-        result.setTerms(terms);
+    public boolean isStopWords(String word) {
+        return stopWords.contains(word);
     }
-    public ArrayList<String> getStopWords(){
-        ArrayList<String> stopWords = new ArrayList<String>();
+
+    public ArrayList<String> getWords(String fileUrl){
+        ArrayList<String> result = new ArrayList<String>();
 
         try {
-            FileInputStream fis = new FileInputStream("/Users/dongyixuan/workspace/证据链/stopWords.txt");
+            FileInputStream fis = new FileInputStream(fileUrl);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fis,"UTF-8"));
             String tempString = null;
             while ((tempString = reader.readLine())!=null) {
-                String[] str = tempString.split(",");
-                stopWords.add(str[0]);
+                result.add(tempString);
             }
             reader.close();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        return stopWords;
+        return result;
     }
 }

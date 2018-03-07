@@ -13,26 +13,27 @@ import org.xml.sax.SAXException;
 
 import reader.ReaderFactory;
 import reader.XMLReader;
-import model.EvidenceModel;
 import model.FactModel;
+import model.EvidenceModel;
 import writer.JsonWriter;
+import java.util.HashSet;
 
 public class ChainCreator {
 	
 	private String[] keyList = {"what","where","when","who","how much"};
 	
-	public void creatChain(String folderName, String fileName, ArrayList<FactModel> fList, ArrayList<EvidenceModel> eList){
+	public void creatChain(String folderName,String childFolderName, String fileName, ArrayList<FactModel> fList, ArrayList<EvidenceModel> eList,HashSet<String> typeList){
 		ReaderFactory fac = new ReaderFactory();
 		XMLReader xmlReader = new XMLReader();
-		String filePath = folderName + "/" + fileName;
+		String filePath = folderName + "/" + childFolderName + "/" + fileName;
 		String type = xmlReader.getType(filePath);
 		xmlReader = fac.createXMLReader(type);
 		
 		try {
 			//读取事实集及事实相关证据集
-			fList = xmlReader.getFactlist(filePath);
+			fList = xmlReader.getFactlist(filePath,typeList);
 			//读取无关联点证据集
-			eList = xmlReader.getEvidencelist(filePath);
+			eList = xmlReader.getEvidencelist(filePath,typeList);
 			
 			//提取关键要素
 			KeyWordCalculator calculator = new KeyWordCalculator();
@@ -41,10 +42,10 @@ public class ChainCreator {
 			JsonWriter jsonWriter = new JsonWriter();
 			//构建证据事实关系
 			calcLink(fList, eList);
-			jsonWriter.writeListToJson(fList,folderName+"/result/fact/"+fileName+"fact.json");
-			jsonWriter.writeListToJson(eList,folderName+"/result/evidence/"+fileName+"evidence.json");
 			//计算证据链头
-			calcHead(fList);
+			//calcHead(fList);
+			jsonWriter.writeListToJson(fList,folderName+"/result2/fact/"+fileName+"fact.json");
+			jsonWriter.writeListToJson(eList,folderName+"/result2/evidence/"+fileName+"evidence.json");
 			
 		} catch (XPathExpressionException e) {
 			// TODO Auto-generated catch block

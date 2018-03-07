@@ -3,14 +3,15 @@ package writer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
 import manager.ChainCreator;
 import manager.KeyWordCalculator;
-import model.EvidenceModel;
 import model.FactModel;
+import model.EvidenceModel;
 
 import org.xml.sax.SAXException;
 
@@ -32,13 +33,14 @@ public class ConsoleWriter {
 		xmlReader = fac.createXMLReader(type);
 		
 		System.out.println("文件："+filePath);
+		HashSet<String> typeList = new HashSet<>();
 		
 		try {
 			@SuppressWarnings("unchecked")
 			//读取事实集及事实相关证据集
-			ArrayList<FactModel> fList = xmlReader.getFactlist(filePath);
+			ArrayList<FactModel> fList = xmlReader.getFactlist(filePath,typeList);
 			//读取无关联点证据集
-			ArrayList<EvidenceModel> eList = xmlReader.getEvidencelist(filePath);
+			ArrayList<EvidenceModel> eList = xmlReader.getEvidencelist(filePath,typeList);
 			
 			//测试事实集和证据集获取
 //			for(FactModel fact : fList){

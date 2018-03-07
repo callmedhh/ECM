@@ -3,14 +3,15 @@ package reader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
-import model.EvidenceModel;
 import model.FactModel;
+import model.EvidenceModel;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -22,7 +23,7 @@ import org.xml.sax.SAXException;
 public class XMLReaderCiAndAd extends XMLReader {
 
 	/*获得事实集，事实中没有关联的证据集*/
-	public ArrayList<FactModel> getFactlist(String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	public ArrayList<FactModel> getFactlist(String path, HashSet<String> typeList) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		ArrayList<FactModel> factList = new ArrayList<FactModel>();
 		
 		DocumentBuilderFactory dbf =DocumentBuilderFactory.newInstance();			  
@@ -44,7 +45,7 @@ public class XMLReaderCiAndAd extends XMLReader {
 	}
 	
 	/*获得没有关联事实的证据集*/
-	public ArrayList<EvidenceModel> getEvidencelist(String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
+	public ArrayList<EvidenceModel> getEvidencelist(String path, HashSet<String> typeList) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException{
 		ArrayList<EvidenceModel> evidenceList = new ArrayList<EvidenceModel>();
 		
 		DocumentBuilderFactory dbf =DocumentBuilderFactory.newInstance();			  
@@ -58,7 +59,7 @@ public class XMLReaderCiAndAd extends XMLReader {
 			for(int i=0;i<nodes.getLength();i++){
 				EvidenceModel evidence = new EvidenceModel();
 				Node node = nodes.item(i);
-				evidence.setEvidence(node);
+				evidence.setEvidence(node,typeList);
 			}
 		}
 
