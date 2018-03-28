@@ -14,15 +14,15 @@ public class Main {
 
     public static void main(String[] args) throws IOException{
         //遍历文件夹下所有的文件,生成中间计算结果
-        String path = "/Users/dongyixuan/workspace/证据链/裁判文书/故意杀人罪/2014";
+        String path = "/Users/dongyixuan/workspace/证据链/裁判文书/故意杀人罪/2015";
         File folder = new File(path);
         if (folder.exists()) {
             File[] files = folder.listFiles();
             HashSet<String> typeList = new HashSet<>();
             for (File file2: files) {
-                if (file2.isFile() && file2.getAbsolutePath().endsWith(".xml")) {
+                if (file2.isFile()) {
                     System.out.println("processing:"+file2.getName());
-                    generateIntermediateResult("2014",file2.getName(),typeList);
+                    generateIntermediateResult("2015",file2.getName(),typeList);
                 }
             }
             for (String type: typeList){

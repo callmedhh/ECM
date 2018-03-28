@@ -100,10 +100,11 @@ public class KeyWordCalculator {
                 "\\d+年\\d+月\\d+日\\d+时\\d+分|"
                         + "\\d+年\\d+月\\d+日\\d+时|"
                         + "\\d+年\\d+月\\d+日|"
+                        +"\\d+日|"
                         + "\\d+年\\d+月|"
                         + "\\d+月\\d+日|"
                         + "\\d+时\\d+分|"
-                        + "\\d时");
+                        + "\\d+时");
         Matcher matcher = pattern.matcher(content);
         while(matcher.find()) {
             String when = matcher.group();
