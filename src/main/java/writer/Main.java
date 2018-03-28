@@ -20,7 +20,7 @@ public class Main {
             File[] files = folder.listFiles();
             HashSet<String> typeList = new HashSet<>();
             for (File file2: files) {
-                if (file2.isFile()) {
+                if (file2.isFile() && file2.getAbsolutePath().endsWith("444.xml")) {
                     System.out.println("processing:"+file2.getName());
                     generateIntermediateResult("2015",file2.getName(),typeList);
                 }
